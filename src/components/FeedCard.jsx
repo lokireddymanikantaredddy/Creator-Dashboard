@@ -10,39 +10,12 @@ const sourceIcons = {
 };
 
 export default function FeedCard({ content, userId }) {
-  const [isSaved, setIsSaved] = useState(content.isSaved || false);
-  const [isReported, setIsReported] = useState(false);
   const [isLiked, setIsLiked] = useState(content.isLiked || false);
   const [likeCount, setLikeCount] = useState(content.likes || 0);
+  const [commentCount, setCommentCount] = useState(content.comments || 0);
 
-  const handleSave = async () => {
-    try {
-      if (isSaved) {
-        await api.delete(`/feed/save/${content._id}`);
-        toast.success('Removed from saved');
-      } else {
-        await api.post(`/feed/save/${content._id}`);
-        toast.success('Saved! +5 credits');
-      }
-      setIsSaved(!isSaved);
-    } catch (err) {
-      toast.error(err.response?.data?.msg || 'Failed to save');
-    }
-  };
-
-  const handleReport = async () => {
-    if (isReported) return;
-    
-    try {
-      await api.post(`/feed/report/${content._id}`);
-      setIsReported(true);
-      toast.success('Content reported. Our team will review it.');
-    } catch (err) {
-      toast.error(err.response?.data?.msg || 'Failed to report');
-    }
-  };
-
-  const handleLike = async () => {
+  const handleLike = async (e) => {
+    e.stopPropagation(); // Prevent triggering the card click
     try {
       if (isLiked) {
         await api.delete(`/feed/like/${content._id}`);
@@ -57,13 +30,27 @@ export default function FeedCard({ content, userId }) {
     }
   };
 
-  const handleShare = () => {
-    navigator.clipboard.writeText(content.url || content.link);
+  const handleShare = (e) => {
+    e.stopPropagation();
+    navigator.clipboard.writeText(content.url);
     toast.success('Link copied to clipboard!');
   };
 
+  const handleCommentClick = (e) => {
+    e.stopPropagation();
+    // In a real app, this would open a comments section/modal
+    toast('Comment feature coming soon!', { icon: '💬' });
+  };
+
+  const handleCardClick = () => {
+    window.open(content.url, '_blank');
+  };
+
   return (
-    <div className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
+    <div 
+      className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow cursor-pointer"
+      onClick={handleCardClick}
+    >
       <div className="p-4">
         <div className="flex items-center mb-2">
           <span className="text-xl mr-2">{sourceIcons[content.source]}</span>
@@ -87,40 +74,29 @@ export default function FeedCard({ content, userId }) {
         <p className="text-gray-600 mb-4 line-clamp-3">{content.text || content.body}</p>
         
         <div className="flex justify-between items-center border-t pt-3">
-          <button 
-            onClick={handleLike}
-            className={`flex items-center ${isLiked ? 'text-red-500' : 'text-gray-500'}`}
-          >
-            ♥ {likeCount > 0 && likeCount}
-          </button>
-          
-          <div className="flex space-x-2">
+          <div className="flex space-x-4">
             <button 
-              onClick={handleSave}
-              className={`p-2 rounded-full ${isSaved ? 'bg-yellow-100 text-yellow-600' : 'hover:bg-gray-100'}`}
-              title={isSaved ? 'Unsave' : 'Save'}
+              onClick={handleLike}
+              className={`flex items-center ${isLiked ? 'text-red-500' : 'text-gray-500'}`}
             >
-              {isSaved ? '★' : '☆'}
+              ♥ {likeCount > 0 && likeCount}
             </button>
             
             <button 
-              onClick={handleShare}
-              className="p-2 rounded-full hover:bg-gray-100"
-              title="Share"
+              onClick={handleCommentClick}
+              className="flex items-center text-gray-500"
             >
-              ↗
+              💬 {commentCount > 0 && commentCount}
             </button>
-            
-            {!isReported && (
-              <button 
-                onClick={handleReport}
-                className="p-2 rounded-full hover:bg-gray-100 text-red-500"
-                title="Report"
-              >
-                ⚠
-              </button>
-            )}
           </div>
+          
+          <button 
+            onClick={handleShare}
+            className="p-2 rounded-full hover:bg-gray-100"
+            title="Share"
+          >
+            ↗
+          </button>
         </div>
       </div>
     </div>

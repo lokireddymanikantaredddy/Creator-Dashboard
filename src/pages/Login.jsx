@@ -123,7 +123,7 @@ export default function Login() {
           </div>
 
           <div>
-            <button
+            <Link to="/dashboard"
               type="submit"
               disabled={isLoading}
               className={`w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors duration-200 ${isLoading ? 'opacity-70 cursor-not-allowed' : ''}`}
@@ -137,7 +137,7 @@ export default function Login() {
                   Signing in...
                 </>
               ) : 'Sign in'}
-            </button>
+            </Link>
           </div>
         </form>
 

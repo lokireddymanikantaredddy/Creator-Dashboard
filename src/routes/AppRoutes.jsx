@@ -13,32 +13,38 @@ export default function AppRoutes() {
   const { user } = useAuth();
 
   return (
+    // <Routes>
+    //   <Route path="/" element={<Home />} />
+    //   <Route 
+    //     path="/login" 
+    //     element={!user ? <Login /> : <Navigate to="/dashboard" />} 
+    //   />
+    //   <Route 
+    //     path="/register" 
+    //     element={!user ? <Register /> : <Navigate to="/dashboard" />} 
+    //   />
+    //   <Route 
+    //     path="/dashboard" 
+    //     element={user ? <Dashboard /> : <Navigate to="/login" />} 
+    //   />
+    //   <Route 
+    //     path="/feed" 
+    //     element={user ? <Feed /> : <Navigate to="/login" />} 
+    //   />
+    //   <Route 
+    //     path="/admin" 
+    //     element={user?.role === 'admin' ? <AdminPanel /> : <Navigate to="/dashboard" />} 
+    //   />
+    //   <Route path="*" element={<NotFound />} />
+    // </Routes>
     <Routes>
       <Route path="/" element={<Home />} />
-      <Route 
-        path="/login" 
-        element={!user ? <Login /> : <Navigate to="/dashboard" />} 
-      />
-      <Route 
-        path="/register" 
-        element={!user ? <Register /> : <Navigate to="/dashboard" />} 
-      />
-      <Route 
-        path="/dashboard" 
-        element={user ? <Dashboard /> : <Navigate to="/login" />} 
-      />
-      <Route 
-        path="/feed" 
-        element={user ? <Feed /> : <Navigate to="/login" />} 
-      />
-      <Route 
-        path="/admin" 
-        element={user?.role === 'admin' ? <AdminPanel /> : <Navigate to="/dashboard" />} 
-      />
+      <Route path="/login" element={<Login />} />
+      <Route path="/register" element={<Register />} />
+      <Route path="/dashboard" element={<Dashboard />} />
+      <Route path="/feed" element={<Feed />} />
+      <Route path="/admin" element={<AdminPanel />} />
       <Route path="*" element={<NotFound />} />
-      <Route path="/dash" element={<Dashboard />} />
-      <Route path="/ad" element={<AdminPanel />} />
-      <Route path="/fed" element={<Feed />} />
     </Routes>
   );
 }
