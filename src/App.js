@@ -1,25 +1,22 @@
-import logo from './logo.svg';
-import './App.css';
+import React from 'react';
+import { AuthProvider } from './context/AuthContext';
+import AppRoutes from './routes/AppRoutes';
+import Navbar from './components/Navbar';
+import Sidebar from './components/Sidebar';
 
-function App() {
+
+export default function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <AuthProvider>
+      <div className="min-h-screen bg-gray-100">
+        <Navbar />
+        <div className="flex">
+          <Sidebar />
+          <main className="flex-1">
+            <AppRoutes />
+          </main>
+        </div>
+      </div>
+    </AuthProvider>
   );
 }
-
-export default App;
