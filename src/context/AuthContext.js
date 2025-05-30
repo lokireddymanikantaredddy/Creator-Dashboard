@@ -12,6 +12,10 @@ export const AuthProvider = ({ children }) => {
   // Initialize axios instance
   const api = axios.create({
     baseURL: 'http://localhost:5000/api',
+    withCredentials: true,
+    headers: {
+      'Content-Type': 'application/json'
+    }
   });
 
   // Add request interceptor to include token
@@ -21,7 +25,22 @@ export const AuthProvider = ({ children }) => {
       config.headers.Authorization = `Bearer ${token}`;
     }
     return config;
+  }, error => {
+    return Promise.reject(error);
   });
+
+  // Add response interceptor to handle errors
+  api.interceptors.response.use(
+    response => response,
+    error => {
+      if (error.response?.status === 401) {
+        localStorage.removeItem('token');
+        setUser(null);
+        navigate('/login');
+      }
+      return Promise.reject(error);
+    }
+  );
 
   // Check auth state on initial load
   useEffect(() => {
@@ -33,10 +52,12 @@ export const AuthProvider = ({ children }) => {
       }
       
       try {
-        const res = await api.get('/profile');
-        setUser(res.data);
+        const res = await api.get('/auth/me');
+        setUser(res.data.data);
       } catch (err) {
+        console.error('Auth check error:', err);
         localStorage.removeItem('token');
+        setUser(null);
       } finally {
         setLoading(false);
       }
@@ -47,10 +68,12 @@ export const AuthProvider = ({ children }) => {
 
   const register = async (formData) => {
     try {
-      const res = await api.post('/register', formData);
-      localStorage.setItem('token', res.data.token);
-      setUser(res.data.user);
-      navigate('/dashboard');
+      const res = await api.post('/auth/register', formData);
+      if (res.data.success) {
+        localStorage.setItem('token', res.data.token);
+        setUser(res.data.user);
+        return res.data.user;
+      }
     } catch (err) {
       throw err.response?.data?.message || 'Registration failed';
     }
@@ -58,19 +81,28 @@ export const AuthProvider = ({ children }) => {
 
   const login = async (formData) => {
     try {
-      const res = await api.post('/login', formData);
-      localStorage.setItem('token', res.data.token);
-      setUser(res.data.user);
-      navigate('/dashboard');
+      const res = await api.post('/auth/login', formData);
+      if (res.data.success) {
+        localStorage.setItem('token', res.data.token);
+        setUser(res.data.user);
+        return res.data.user;
+      }
     } catch (err) {
+      console.error('Login error:', err);
       throw err.response?.data?.message || 'Login failed';
     }
   };
 
-  const logout = () => {
-    localStorage.removeItem('token');
-    setUser(null);
-    navigate('/login');
+  const logout = async () => {
+    try {
+      await api.get('/auth/logout');
+    } catch (err) {
+      console.error('Logout error:', err);
+    } finally {
+      localStorage.removeItem('token');
+      setUser(null);
+      navigate('/login');
+    }
   };
 
   return (

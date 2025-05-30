@@ -1,12 +1,16 @@
 // routes/userRoutes.js
-const { Router } = require('express');
-const { protect } = require('../middleware/authMiddleware');
+const express = require('express');
+const router = express.Router();
+const { protect, authorize } = require('../middleware/auth');
 const { getUser } = require('../controllers/userController');
-
-const router = Router();
 
 console.log(typeof protect);
 
 router.route('/profile').get(protect, getUser);
+
+// Placeholder for user routes
+router.get('/test', (req, res) => {
+    res.json({ message: 'User routes working' });
+});
 
 module.exports = router; // Exporting a valid router instance

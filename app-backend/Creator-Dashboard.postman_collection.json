@@ -1,0 +1,153 @@
+{
+    "info": {
+        "name": "Creator Dashboard API",
+        "description": "API endpoints for Creator Dashboard",
+        "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+    },
+    "item": [
+        {
+            "name": "Auth",
+            "item": [
+                {
+                    "name": "Register",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"username\": \"testuser\",\n    \"email\": \"test@example.com\",\n    \"password\": \"password123\"\n}"
+                        },
+                        "url": {
+                            "raw": "http://localhost:5000/api/auth/register",
+                            "protocol": "http",
+                            "host": ["localhost"],
+                            "port": "5000",
+                            "path": ["api", "auth", "register"]
+                        }
+                    }
+                },
+                {
+                    "name": "Login",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"email\": \"test@example.com\",\n    \"password\": \"password123\"\n}"
+                        },
+                        "url": {
+                            "raw": "http://localhost:5000/api/auth/login",
+                            "protocol": "http",
+                            "host": ["localhost"],
+                            "port": "5000",
+                            "path": ["api", "auth", "login"]
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "name": "Users",
+            "item": [
+                {
+                    "name": "Get Profile",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "http://localhost:5000/api/users/profile",
+                            "protocol": "http",
+                            "host": ["localhost"],
+                            "port": "5000",
+                            "path": ["api", "users", "profile"]
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "name": "Content",
+            "item": [
+                {
+                    "name": "Create Content",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"title\": \"Test Content\",\n    \"description\": \"This is a test content\",\n    \"content\": \"Test content body\"\n}"
+                        },
+                        "url": {
+                            "raw": "http://localhost:5000/api/content",
+                            "protocol": "http",
+                            "host": ["localhost"],
+                            "port": "5000",
+                            "path": ["api", "content"]
+                        }
+                    }
+                },
+                {
+                    "name": "Get All Content",
+                    "request": {
+                        "method": "GET",
+                        "url": {
+                            "raw": "http://localhost:5000/api/content",
+                            "protocol": "http",
+                            "host": ["localhost"],
+                            "port": "5000",
+                            "path": ["api", "content"]
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "name": "Analytics",
+            "item": [
+                {
+                    "name": "Get Dashboard",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "http://localhost:5000/api/analytics/dashboard",
+                            "protocol": "http",
+                            "host": ["localhost"],
+                            "port": "5000",
+                            "path": ["api", "analytics", "dashboard"]
+                        }
+                    }
+                }
+            ]
+        }
+    ]
+} 

@@ -1,14 +1,15 @@
 // src/pages/Register.jsx
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import api from '../services/api'; // Make sure the path is correct
+import { useAuth } from '../context/AuthContext';
 
 export default function Register() {
-  const [formData, setFormData] = useState({ name: '', email: '', password: '' });
+  const [formData, setFormData] = useState({ username: '', email: '', password: '' });
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
+  const { register } = useAuth();
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -20,10 +21,10 @@ export default function Register() {
     setIsLoading(true);
     setError('');
     try {
-      await api.post('/auth/register', formData);
-      navigate('/login');
+      await register(formData);
+      // Registration successful, user will be automatically logged in and redirected by the register function
     } catch (err) {
-      setError(err.response?.data?.message || 'Registration failed. Please try again.');
+      setError(err.message || 'Registration failed. Please try again.');
     } finally {
       setIsLoading(false);
     }
@@ -48,15 +49,15 @@ export default function Register() {
 
         <form className="mt-6 space-y-5" onSubmit={handleSubmit}>
           <div>
-            <label htmlFor="name" className="block text-sm font-medium text-gray-700">Full Name</label>
+            <label htmlFor="username" className="block text-sm font-medium text-gray-700">Username</label>
             <input
-              id="name"
-              name="name"
+              id="username"
+              name="username"
               type="text"
               required
               className="mt-1 block w-full px-4 py-3 rounded-lg border border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
-              placeholder="John Doe"
-              value={formData.name}
+              placeholder="johndoe"
+              value={formData.username}
               onChange={handleChange}
             />
           </div>
