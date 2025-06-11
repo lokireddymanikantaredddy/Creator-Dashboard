@@ -8,7 +8,8 @@ import {
   FiSettings, 
   FiX,
   FiUser,
-  FiLogOut
+  FiLogOut,
+  FiBarChart2
 } from 'react-icons/fi';
 
 export default function Navigation({ onClose }) {
@@ -18,6 +19,7 @@ export default function Navigation({ onClose }) {
     { name: 'Dashboard', to: '/dashboard', icon: FiHome },
     { name: 'Content', to: '/content', icon: FiGrid },
     { name: 'Learning', to: '/learning', icon: FiBook },
+    { name: 'Analytics', to: '/analytics', icon: FiBarChart2 },
     { name: 'Settings', to: '/settings', icon: FiSettings },
   ];
 
