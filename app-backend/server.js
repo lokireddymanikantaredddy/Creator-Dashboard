@@ -33,7 +33,10 @@ const allowedOrigins = [
     'http://localhost:3000',
     'https://creator-dashboard-nu.vercel.app',
     'https://creator-dashboard-git-main-lokireddymanikantaredddy.vercel.app',
-    'https://creator-dashboard-lokireddymanikantaredddy.vercel.app'
+    'https://creator-dashboard-lokireddymanikantaredddy.vercel.app',
+    'https://creator-dashboard-3oay01emq-lokireddymanikantaredddys-projects.vercel.app',
+    // Allow all Vercel preview deployments
+    /^https:\/\/creator-dashboard.*\.vercel\.app$/
 ];
 
 app.use(cors({
@@ -41,7 +44,15 @@ app.use(cors({
         // Allow requests with no origin (like mobile apps or curl requests)
         if (!origin) return callback(null, true);
         
-        if (allowedOrigins.indexOf(origin) === -1) {
+        // Check if origin matches any of our allowed origins
+        const isAllowed = allowedOrigins.some(allowedOrigin => {
+            if (allowedOrigin instanceof RegExp) {
+                return allowedOrigin.test(origin);
+            }
+            return allowedOrigin === origin;
+        });
+        
+        if (!isAllowed) {
             const msg = 'The CORS policy for this site does not allow access from the specified Origin.';
             return callback(new Error(msg), false);
         }
