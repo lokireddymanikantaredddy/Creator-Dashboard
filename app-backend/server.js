@@ -9,7 +9,8 @@ const connectDB = require('./config/db');
 const { errorHandler } = require('./middleware/errorHandler');
 
 // Set environment
-process.env.NODE_ENV = process.env.NODE_ENV || 'development';
+const isProduction = process.env.NODE_ENV === 'production';
+console.log(`Environment: ${process.env.NODE_ENV}`);
 
 // Import routes
 const authRoutes = require('./routes/authRoutes');
@@ -27,9 +28,23 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
-// CORS configuration - must be before other middleware
+// CORS configuration
+const allowedOrigins = [
+    'http://localhost:3000',
+    'https://creator-dashboard-nu.vercel.app'
+];
+
 app.use(cors({
-    origin: true, // Allow all origins for now (development only)
+    origin: function(origin, callback) {
+        // Allow requests with no origin (like mobile apps or curl requests)
+        if (!origin) return callback(null, true);
+        
+        if (allowedOrigins.indexOf(origin) === -1) {
+            const msg = 'The CORS policy for this site does not allow access from the specified Origin.';
+            return callback(new Error(msg), false);
+        }
+        return callback(null, true);
+    },
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization', 'Accept', 'Origin', 'X-Requested-With']
@@ -43,27 +58,31 @@ app.use(helmet({
 // Rate limiting
 const limiter = rateLimit({
     windowMs: 15 * 60 * 1000, // 15 minutes
-    max: 100 // limit each IP to 100 requests per windowMs
+    max: isProduction ? 100 : 1000 // limit each IP to 100 requests per windowMs in production
 });
 app.use(limiter);
 
 // Logging
-app.use(morgan('dev'));
+if (!isProduction) {
+    app.use(morgan('dev'));
+}
 
 // Debug logging
-app.use((req, res, next) => {
-    console.log('Request:', {
-        method: req.method,
-        path: req.path,
-        origin: req.headers.origin,
-        headers: req.headers
+if (!isProduction) {
+    app.use((req, res, next) => {
+        console.log('Request:', {
+            method: req.method,
+            path: req.path,
+            origin: req.headers.origin,
+            headers: req.headers
+        });
+        next();
     });
-    next();
-});
+}
 
- // Routes
- app.use('/api/auth', authRoutes);
- app.use('/api/users', userRoutes);
+// Routes
+app.use('/api/auth', authRoutes);
+app.use('/api/users', userRoutes);
 app.use('/api/content', contentRoutes);
 app.use('/api/analytics', analyticsRoutes);
 
@@ -72,11 +91,18 @@ app.use(errorHandler);
 
 // Health check endpoint
 app.get('/health', (req, res) => {
-    res.status(200).json({ status: 'ok' });
+    res.status(200).json({ 
+        status: 'ok',
+        environment: process.env.NODE_ENV,
+        timestamp: new Date().toISOString()
+    });
 });
 
 const PORT = process.env.PORT || 5001;
-app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT} in ${process.env.NODE_ENV} mode`));
+app.listen(PORT, () => {
+    console.log(`🚀 Server running on port ${PORT} in ${process.env.NODE_ENV} mode`);
+    console.log(`Health check available at http://localhost:${PORT}/health`);
+});
 
 
 // const express = require("express");

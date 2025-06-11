@@ -10,9 +10,12 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
-  // Initialize axios instance
+  // Initialize axios instance with environment-aware baseURL
   const api = axios.create({
-    baseURL: 'http://localhost:5001/api',
+    baseURL: process.env.REACT_APP_API_URL || 
+            (process.env.NODE_ENV === 'production' 
+              ? 'https://creator-dashboard-backend.onrender.com/api'  // Update this with your Render URL
+              : 'http://localhost:5001/api'),
     withCredentials: true,
     headers: {
       'Content-Type': 'application/json',
