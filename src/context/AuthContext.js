@@ -1,6 +1,7 @@
 import { createContext, useContext, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { toast } from 'react-hot-toast';
 
 const AuthContext = createContext();
 
@@ -11,52 +12,65 @@ export const AuthProvider = ({ children }) => {
 
   // Initialize axios instance
   const api = axios.create({
-    baseURL: 'http://localhost:5000/api',
+    baseURL: 'http://localhost:5001/api',
     withCredentials: true,
     headers: {
-      'Content-Type': 'application/json'
+      'Content-Type': 'application/json',
+      'Accept': 'application/json'
+    },
+    validateStatus: status => {
+      return status >= 200 && status < 500; // Don't reject if status is 2xx or 4xx
     }
   });
 
-  // Add request interceptor to include token
-  api.interceptors.request.use(config => {
-    const token = localStorage.getItem('token');
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-    return config;
-  }, error => {
-    return Promise.reject(error);
-  });
-
-  // Add response interceptor to handle errors
-  api.interceptors.response.use(
-    response => response,
-    error => {
-      if (error.response?.status === 401) {
-        localStorage.removeItem('token');
-        setUser(null);
-        navigate('/login');
-      }
+  // Add request interceptor for debugging
+  api.interceptors.request.use(
+    (config) => {
+      console.log('Making request:', {
+        method: config.method,
+        url: config.url,
+        data: config.data,
+        headers: config.headers
+      });
+      return config;
+    },
+    (error) => {
+      console.error('Request error:', error);
       return Promise.reject(error);
+    }
+  );
+
+  // Add response interceptor for debugging
+  api.interceptors.response.use(
+    (response) => {
+      console.log('Received response:', {
+        status: response.status,
+        data: response.data,
+        headers: response.headers
+      });
+      return response;
+    },
+    (error) => {
+      console.error('Response error:', {
+        message: error.message,
+        response: error.response?.data,
+        status: error.response?.status
+      });
+      return Promise.reject(error.response?.data || error);
     }
   );
 
   // Check auth state on initial load
   useEffect(() => {
     const checkAuth = async () => {
-      const token = localStorage.getItem('token');
-      if (!token) {
-        setLoading(false);
-        return;
-      }
-      
       try {
         const res = await api.get('/auth/me');
-        setUser(res.data.data);
+        if (res.data.success && res.data.user) {
+          setUser(res.data.user);
+          console.log('Auth check successful:', res.data.user);
+        }
       } catch (err) {
         console.error('Auth check error:', err);
-        localStorage.removeItem('token');
         setUser(null);
       } finally {
         setLoading(false);
@@ -70,46 +84,75 @@ export const AuthProvider = ({ children }) => {
     try {
       const res = await api.post('/auth/register', formData);
       if (res.data.success) {
-        localStorage.setItem('token', res.data.token);
         setUser(res.data.user);
-        return res.data.user;
+        toast.success('Registration successful!');
+        navigate('/dashboard');
+        return res.data;
       }
+      throw new Error(res.data.message || 'Registration failed');
     } catch (err) {
-      throw err.response?.data?.message || 'Registration failed';
+      console.error('Registration error:', err);
+      throw err.message || 'Registration failed';
     }
   };
 
   const login = async (formData) => {
     try {
+      console.log('Sending login request with:', formData);
       const res = await api.post('/auth/login', formData);
+      
+      console.log('Login response:', res.data);
+      
       if (res.data.success) {
-        localStorage.setItem('token', res.data.token);
         setUser(res.data.user);
-        return res.data.user;
+        return res.data;
+      } else {
+        throw new Error(res.data.message || 'Login failed');
       }
     } catch (err) {
-      console.error('Login error:', err);
-      throw err.response?.data?.message || 'Login failed';
+      console.error('Login error:', {
+        message: err.message,
+        response: err.response?.data,
+        status: err.response?.status
+      });
+      throw err.response?.data?.message || err.message || 'Login failed';
     }
   };
 
   const logout = async () => {
     try {
-      await api.get('/auth/logout');
+      await api.post('/auth/logout');
+      setUser(null);
+      toast.success('Logged out successfully');
+      navigate('/login');
     } catch (err) {
       console.error('Logout error:', err);
-    } finally {
-      localStorage.removeItem('token');
+      // Still clear the user state even if the logout request fails
       setUser(null);
       navigate('/login');
     }
   };
 
+  const value = {
+    user,
+    loading,
+    register,
+    login,
+    logout,
+    api
+  };
+
   return (
-    <AuthContext.Provider value={{ user, loading, register, login, logout, api }}>
+    <AuthContext.Provider value={value}>
       {!loading && children}
     </AuthContext.Provider>
   );
 };
 
-export const useAuth = () => useContext(AuthContext);
+export const useAuth = () => {
+  const context = useContext(AuthContext);
+  if (!context) {
+    throw new Error('useAuth must be used within an AuthProvider');
+  }
+  return context;
+};

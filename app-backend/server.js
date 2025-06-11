@@ -22,13 +22,22 @@ const app = express();
 // Connect Database
 connectDB();
 
-// Security Middleware
+// Basic middleware
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser());
+
+// CORS configuration - must be before other middleware
 app.use(cors({
-    origin: 'http://localhost:3000',
+    origin: true, // Allow all origins for now (development only)
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization', 'Accept', 'Origin', 'X-Requested-With'],
-    exposedHeaders: ['Authorization']
+    allowedHeaders: ['Content-Type', 'Authorization', 'Accept', 'Origin', 'X-Requested-With']
+}));
+
+// Security middleware
+app.use(helmet({
+    crossOriginResourcePolicy: false
 }));
 
 // Rate limiting
@@ -38,19 +47,15 @@ const limiter = rateLimit({
 });
 app.use(limiter);
 
-// Middleware
-app.use(express.json());
-app.use(express.urlencoded({ extended: true, limit: '50mb' }));
-app.use(cookieParser());
-app.use(helmet());
-app.use(morgan('dev')); // Logging
+// Logging
+app.use(morgan('dev'));
 
-// Add request logging middleware
+// Debug logging
 app.use((req, res, next) => {
-    console.log('Request received:', {
+    console.log('Request:', {
         method: req.method,
         path: req.path,
-        body: req.body,
+        origin: req.headers.origin,
         headers: req.headers
     });
     next();
@@ -70,7 +75,7 @@ app.get('/health', (req, res) => {
     res.status(200).json({ status: 'ok' });
 });
 
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 5001;
 app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT} in ${process.env.NODE_ENV} mode`));
 
 

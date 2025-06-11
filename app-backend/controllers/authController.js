@@ -30,7 +30,14 @@ const sendTokenResponse = (user, statusCode, res) => {
                     id: user._id,
                     username: user.username,
                     email: user.email,
-                    role: user.role
+                    role: user.role,
+                    credits: user.credits,
+                    streak: user.streak,
+                    profileImage: user.profileImage,
+                    bio: user.bio,
+                    socialLinks: user.socialLinks,
+                    isVerified: user.isVerified,
+                    profileCompleted: user.profileCompleted
                 }
             });
     } catch (error) {
@@ -130,7 +137,19 @@ exports.getMe = async (req, res, next) => {
         const user = await User.findById(req.user.id);
         res.status(200).json({
             success: true,
-            data: user
+            data: {
+                id: user._id,
+                username: user.username,
+                email: user.email,
+                role: user.role,
+                credits: user.credits,
+                streak: user.streak,
+                profileImage: user.profileImage,
+                bio: user.bio,
+                socialLinks: user.socialLinks,
+                isVerified: user.isVerified,
+                profileCompleted: user.profileCompleted
+            }
         });
     } catch (error) {
         next(error);

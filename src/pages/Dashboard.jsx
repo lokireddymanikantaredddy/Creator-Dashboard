@@ -1,134 +1,201 @@
 import React from 'react';
 import { useAuth } from '../context/AuthContext';
-import CreditsDisplay from '../components/CreditsDisplay';
-import { FiActivity, FiTrendingUp, FiAward, FiClock } from 'react-icons/fi';
+import { FiClock, FiBookmark, FiAward, FiHelpCircle, FiZap, FiCalendar, FiCheckCircle } from 'react-icons/fi';
+import Tooltip from '../components/common/Tooltip';
 
 export default function Dashboard() {
   const { user } = useAuth();
 
-  // Sample activity data - replace with your actual data
+  // Get display name from user data
+  const displayName = user?.username || user?.email?.split('@')[0] || 'User';
+
+  // Stats data with proper styling and layout
+  const stats = [
+    {
+      id: 1,
+      name: 'Daily Active',
+      value: '3.2h',
+      icon: FiClock,
+      iconBg: 'bg-green-100',
+      iconColor: 'text-green-600',
+      tooltip: 'Time spent actively engaging with content today'
+    },
+    {
+      id: 2,
+      name: 'Content Saved',
+      value: '24',
+      icon: FiBookmark,
+      iconBg: 'bg-blue-100',
+      iconColor: 'text-blue-600',
+      tooltip: 'Number of content items you have saved for later'
+    },
+    {
+      id: 3,
+      name: 'Achievements',
+      value: '5/12',
+      icon: FiAward,
+      iconBg: 'bg-purple-100',
+      iconColor: 'text-purple-600',
+      tooltip: 'Completed achievements out of total available'
+    }
+  ];
+
   const recentActivity = [
-    { id: 1, type: 'login', value: '+10 credits', time: '2 hours ago' },
-    { id: 2, type: 'content_saved', value: 'Saved "React Tips"', time: '5 hours ago' },
-    { id: 3, type: 'streak', value: '3 day streak!', time: 'Yesterday' },
-    { id: 4, type: 'profile', value: 'Profile 80% complete', time: '2 days ago' },
+    {
+      id: 1,
+      type: 'login',
+      description: 'Daily login bonus',
+      credits: '+10 credits',
+      time: '2 hours ago',
+      icon: FiZap,
+      iconBg: 'bg-indigo-100',
+      iconColor: 'text-indigo-600'
+    },
+    {
+      id: 2,
+      type: 'content',
+      description: 'Saved "React Tips"',
+      time: '5 hours ago',
+      icon: FiBookmark,
+      iconBg: 'bg-blue-100',
+      iconColor: 'text-blue-600'
+    }
+  ];
+
+  const creditWays = [
+    { icon: FiCalendar, text: 'Daily login bonus', credits: '+10' },
+    { icon: FiCheckCircle, text: 'Complete tasks', credits: '+5-20' }
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Welcome Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">Welcome back, {user?.name || 'User'}!</h1>
-          <p className="mt-2 text-lg text-gray-600">Here's what's happening with your account today.</p>
-        </div>
-        
-        {/* Main Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 mb-8">
-          {/* Credits Display - spans first column */}
-          <div className="lg:col-span-1">
-            <CreditsDisplay />
-          </div>
-          
-          {/* Activity Section - spans remaining columns */}
-          <div className="lg:col-span-3 space-y-6">
-            {/* Stats Cards Row */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-                <div className="flex items-center">
-                  <div className="p-3 rounded-full bg-green-50 text-green-600 mr-4">
-                    <FiActivity size={20} />
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium text-gray-500">Daily Active</p>
-                    <p className="text-2xl font-bold">3.2h</p>
-                  </div>
-                </div>
+    <div className="bg-white rounded-lg">
+      {/* Welcome Section */}
+      <div className="p-6 border-b">
+        <h1 className="text-2xl font-semibold text-gray-900">
+          Welcome back, {displayName} 👋
+        </h1>
+        <p className="mt-1 text-sm text-gray-500">
+          Here's what's happening with your account today.
+        </p>
+      </div>
+
+      {/* Stats Section */}
+      <div className="p-6 grid grid-cols-1 sm:grid-cols-3 gap-6">
+        {stats.map((item) => (
+          <div 
+            key={item.id} 
+            className="bg-white border rounded-lg p-6"
+          >
+            <div className="flex items-center">
+              <div className={`${item.iconBg} rounded-lg p-3`}>
+                <item.icon className={`h-6 w-6 ${item.iconColor}`} />
               </div>
-              
-              <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-                <div className="flex items-center">
-                  <div className="p-3 rounded-full bg-blue-50 text-blue-600 mr-4">
-                    <FiTrendingUp size={20} />
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium text-gray-500">Content Saved</p>
-                    <p className="text-2xl font-bold">24</p>
-                  </div>
-                </div>
-              </div>
-              
-              <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-                <div className="flex items-center">
-                  <div className="p-3 rounded-full bg-purple-50 text-purple-600 mr-4">
-                    <FiAward size={20} />
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium text-gray-500">Achievements</p>
-                    <p className="text-2xl font-bold">5/12</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-            {/* Activity Feed */}
-            <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-              <div className="flex justify-between items-center mb-6">
-                <h2 className="text-xl font-semibold flex items-center">
-                  <FiClock className="mr-2 text-indigo-600" />
-                  Recent Activity
-                </h2>
-                <button className="text-sm text-indigo-600 hover:text-indigo-800 font-medium">
-                  View All
-                </button>
-              </div>
-              
-              <div className="space-y-4">
-                {recentActivity.map(activity => (
-                  <div key={activity.id} className="flex items-start p-3 hover:bg-gray-50 rounded-lg transition-colors duration-150">
-                    <div className="flex-shrink-0 mt-1">
-                      <div className="h-8 w-8 rounded-full bg-indigo-50 flex items-center justify-center text-indigo-600">
-                        {activity.type === 'login' && <FiActivity size={16} />}
-                        {activity.type === 'content_saved' && <FiTrendingUp size={16} />}
-                        {activity.type === 'streak' && <FiAward size={16} />}
-                        {activity.type === 'profile' && <FiClock size={16} />}
-                      </div>
-                    </div>
-                    <div className="ml-4 flex-1">
-                      <div className="flex items-center justify-between">
-                        <p className="text-sm font-medium text-gray-900">
-                          {activity.type === 'login' && 'Daily login bonus'}
-                          {activity.type === 'content_saved' && 'Content saved'}
-                          {activity.type === 'streak' && 'Streak maintained'}
-                          {activity.type === 'profile' && 'Profile updated'}
-                        </p>
-                        <span className="text-xs text-gray-500">{activity.time}</span>
-                      </div>
-                      <p className="text-sm text-gray-600 mt-1">{activity.value}</p>
-                    </div>
-                  </div>
-                ))}
+              <div className="ml-4">
+                <p className="text-sm font-medium text-gray-500 truncate">
+                  {item.name}
+                </p>
+                <p className="mt-1 text-xl font-semibold text-gray-900">
+                  {item.value}
+                </p>
               </div>
             </div>
           </div>
+        ))}
+      </div>
+
+      <div className="p-6 grid grid-cols-1 lg:grid-cols-2 gap-6 border-t">
+        {/* Credits Section */}
+        <div className="bg-white border rounded-lg p-6">
+          <div className="flex items-center justify-between">
+            <h2 className="text-lg font-medium text-gray-900">Your Credits</h2>
+            <Tooltip content="Learn how to earn and use credits">
+              <button className="text-sm text-indigo-600 hover:text-indigo-900 flex items-center">
+                <FiHelpCircle className="h-4 w-4 mr-1" />
+                How it works
+              </button>
+            </Tooltip>
+          </div>
+          <div className="mt-4">
+            <div className="flex items-baseline">
+              <p className="text-4xl font-semibold text-gray-900">{user?.credits || 0}</p>
+              <p className="ml-2 text-sm text-gray-500">Available credits</p>
+            </div>
+            <div className="mt-4">
+              <div className="relative pt-1">
+                <div className="flex mb-2 items-center justify-between">
+                  <Tooltip content="Unlock special rewards at 500 credits!">
+                    <span className="text-xs font-semibold inline-block text-gray-600">
+                      Next reward at 500 credits
+                    </span>
+                  </Tooltip>
+                  <div className="text-right">
+                    <span className="text-xs font-semibold inline-block text-gray-600">
+                      {user?.credits || 0}/500
+                    </span>
+                  </div>
+                </div>
+                <div className="overflow-hidden h-2 mb-4 text-xs flex rounded bg-gray-100">
+                  <div 
+                    className="bg-gradient-to-r from-indigo-500 to-purple-500 rounded transition-all duration-500"
+                    style={{ width: `${Math.min(((user?.credits || 0) / 500) * 100, 100)}%` }}
+                  ></div>
+                </div>
+              </div>
+            </div>
+            <div className="mt-6 space-y-4">
+              <h3 className="text-sm font-medium text-gray-900">Ways to earn credits:</h3>
+              {creditWays.map((way, index) => (
+                <div key={index} className="flex items-center justify-between text-sm">
+                  <div className="flex items-center text-gray-600">
+                    <way.icon className="h-4 w-4 mr-2" />
+                    <span>{way.text}</span>
+                  </div>
+                  <span className="text-green-600 font-medium">{way.credits}</span>
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
-        
-        {/* Quick Actions */}
-        <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-          <h2 className="text-xl font-semibold mb-4">Quick Actions</h2>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <button className="p-4 bg-indigo-50 text-indigo-700 rounded-lg hover:bg-indigo-100 transition-colors duration-200">
-              Add Content
-            </button>
-            <button className="p-4 bg-green-50 text-green-700 rounded-lg hover:bg-green-100 transition-colors duration-200">
-              Invite Friends
-            </button>
-            <button className="p-4 bg-purple-50 text-purple-700 rounded-lg hover:bg-purple-100 transition-colors duration-200">
-              View Achievements
-            </button>
-            <button className="p-4 bg-blue-50 text-blue-700 rounded-lg hover:bg-blue-100 transition-colors duration-200">
-              Settings
-            </button>
+
+        {/* Recent Activity Section */}
+        <div className="bg-white border rounded-lg p-6">
+          <div className="flex items-center justify-between">
+            <h2 className="text-lg font-medium text-gray-900">Recent Activity</h2>
+            <button className="text-sm text-indigo-600 hover:text-indigo-900">View All</button>
+          </div>
+          <div className="mt-6 flow-root">
+            <ul className="-mb-8">
+              {recentActivity.map((item, itemIdx) => (
+                <li key={item.id}>
+                  <div className="relative pb-8">
+                    {itemIdx !== recentActivity.length - 1 ? (
+                      <span
+                        className="absolute top-4 left-4 -ml-px h-full w-0.5 bg-gray-200"
+                        aria-hidden="true"
+                      />
+                    ) : null}
+                    <div className="relative flex items-center space-x-3 hover:bg-gray-50 p-2 rounded-lg transition-colors duration-200">
+                      <div>
+                        <span className={`${item.iconBg} h-8 w-8 rounded-full flex items-center justify-center ring-8 ring-white`}>
+                          <item.icon className={`h-5 w-5 ${item.iconColor}`} />
+                        </span>
+                      </div>
+                      <div className="min-w-0 flex-1 flex justify-between space-x-4">
+                        <div>
+                          <p className="text-sm text-gray-600">{item.description}</p>
+                          {item.credits && (
+                            <p className="text-xs text-green-600 font-medium mt-0.5">{item.credits}</p>
+                          )}
+                        </div>
+                        <div className="text-right text-sm whitespace-nowrap text-gray-500">
+                          <time>{item.time}</time>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </li>
+              ))}
+            </ul>
           </div>
         </div>
       </div>
