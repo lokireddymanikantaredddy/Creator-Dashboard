@@ -14,7 +14,7 @@ export const AuthProvider = ({ children }) => {
   const api = axios.create({
     baseURL: process.env.REACT_APP_API_URL || 
             (process.env.NODE_ENV === 'production' 
-              ? 'https://creator-dashboard-backend-iqxe.onrender.com/api'  // Update with your actual deployed backend URL
+              ? 'https://creator-dashboard-backend-lvf1.onrender.com/api'  // Updated backend URL
               : 'http://localhost:5001/api'),
     withCredentials: true,
     headers: {

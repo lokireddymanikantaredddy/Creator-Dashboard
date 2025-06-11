@@ -32,7 +32,8 @@ app.use(cookieParser());
 const allowedOrigins = [
     'http://localhost:3000',
     'https://creator-dashboard-nu.vercel.app',
-    'https://creator-dashboard-git-main-lokireddymanikantaredddy.vercel.app'
+    'https://creator-dashboard-git-main-lokireddymanikantaredddy.vercel.app',
+    'https://creator-dashboard-lokireddymanikantaredddy.vercel.app'
 ];
 
 app.use(cors({
