@@ -1,14 +1,18 @@
-# Build stage
-FROM node:16 as builder
-WORKDIR /app
-COPY package*.json ./
-RUN npm install
-COPY . .
-RUN npm run build
-
-# Run stage
 FROM node:16-alpine
+
 WORKDIR /app
-COPY --from=builder /app .
-EXPOSE 5000
+
+# Copy package files
+COPY package*.json ./
+
+# Install dependencies
+RUN npm install --production
+
+# Copy application files
+COPY . .
+
+# Expose the port your app runs on
+EXPOSE 5001
+
+# Start the application
 CMD ["node", "server.js"]
